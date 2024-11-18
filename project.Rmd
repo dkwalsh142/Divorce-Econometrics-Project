@@ -1,0 +1,65 @@
+---
+title: "AGEMARR vs MARST"
+author: "Declan Walsh, Gavin Galen, and Jawand Singh"
+date: "9/24/24"
+output:
+  pdf_document: default
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE)
+```
+
+```{r}
+# install libraries
+# install.packages(c("htmltools", "shiny", "DT"))
+# load ipums lib
+library(ipumsr)
+# get data
+ddi = read_ipums_ddi("ipumsi_00002.xml")
+data = read_ipums_micro(ddi)
+# look at data
+ipums_view(data)
+```
+
+```{r}
+## check for missing data 
+sum(data$EDATTAIN == 0) 
+sum(data$EDATTAIN == 9) 
+sum(data$INCTOT == 9999999)
+sum(data$CHBORN == 98)
+sum(data$EMPSTAT == 0)
+sum(data$EMPSTAT == 9)
+sum(data$AGEMARR == 0)
+sum(data$AGEMARR == 99)
+sum(data$MARST == 0)
+sum(data$MARST == 9)
+sum(data$MARST == 1)
+sum(data$MARST == 4)
+data = subset(data, EDATTAIN != 0)
+data = subset(data, INCTOT != 9999999)
+data = subset(data, EMPSTAT != 0)
+data = subset(data, AGEMARR != 0)
+data = subset(data, MARST != 1)
+data = subset(data, MARST != 4)
+## control variables
+# urban area
+data$urban = ifelse(data$METROUS != 0, 1, 0)
+# education 
+data$educ_min = ifelse(data$EDATTAIN == 1, 1, 0)
+data$educ_primary = ifelse(data$EDATTAIN == 2, 1, 0)
+data$educ_secondary = ifelse(data$EDATTAIN == 3, 1, 0)
+data$educ_university = ifelse(data$EDATTAIN == 4, 1, 0)
+# income 
+data$income = data$INCTOT
+# children
+data$children = data$CHBORN
+# employment
+data$employed = ifelse(data$EMPSTAT == 1, 1, 0)
+## independent variable
+data$age_married = data$AGEMARR
+## dependent variable
+data$divorced = ifelse(data$MARST == 3, 1, 0)
+```
