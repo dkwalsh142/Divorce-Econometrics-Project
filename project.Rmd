@@ -35,10 +35,12 @@ sum(data$EMPSTAT == 0)
 sum(data$EMPSTAT == 9)
 sum(data$AGEMARR == 0)
 sum(data$AGEMARR == 99)
+sum(data$AGEMARR < 18) # 5,572,243 / 11,343,120
+                       # 488,465   / 2,969,960
 sum(data$MARST == 0)
 sum(data$MARST == 9)
 sum(data$MARST == 1)
-sum(data$MARST == 4)
+sum(data$MARST == 4) 
 data = subset(data, CHBORN != 99)
 data = subset(data, EDATTAIN != 0)
 data = subset(data, INCTOT != 9999999)
