@@ -127,3 +127,19 @@ round(coeff["educ_primary"] * 100, 3)
 round(coeff["educ_secondary"] * 100, 3)
 round(coeff["educ_university"] * 100, 3)
 ```
+
+```{r}
+#functional form misspecification tests
+#install.packages("lmtest")
+#library(lmtest)
+
+model = lm(divorced ~ age_married + employed + children + income + educ_primary + educ_secondary + educ_university, data = data)
+resettest(model, power = 2:3, type = "fitted")
+
+data$income_nonnegative <- ifelse(data$income <= 0, .1, data$income)
+data$children_nonzero <- ifelse(data$children <= 0, .1, data$children)
+
+model_2 = lm(divorced ~ I(log(age_married)) + employed + I(log(children_nonzero)) + I(log(income_nonnegative)) + educ_primary + educ_secondary + educ_university, data = data)
+resettest(model_2, power = 2:3, type = "fitted")
+
+```
