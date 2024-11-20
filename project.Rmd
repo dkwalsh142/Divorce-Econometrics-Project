@@ -130,8 +130,8 @@ round(coeff["educ_university"] * 100, 3)
 
 ```{r}
 #functional form misspecification tests
-#install.packages("lmtest")
-#library(lmtest)
+install.packages("lmtest")
+library(lmtest)
 
 model = lm(divorced ~ age_married + employed + children + income + educ_primary + educ_secondary + educ_university, data = data)
 resettest(model, power = 2:3, type = "fitted")
@@ -141,5 +141,50 @@ data$children_nonzero <- ifelse(data$children <= 0, .1, data$children)
 
 model_2 = lm(divorced ~ I(log(age_married)) + employed + I(log(children_nonzero)) + I(log(income_nonnegative)) + educ_primary + educ_secondary + educ_university, data = data)
 resettest(model_2, power = 2:3, type = "fitted")
+
+# Polynomial terms
+model_poly <- lm(divorced ~ age_married + I(age_married^2) + employed + children + income + educ_primary + educ_secondary + educ_university, data = data)
+resettest(model_poly, power = 2:3, type = "fitted")
+
+# Interaction terms
+model_interaction <- lm(divorced ~ age_married * income + employed + children + educ_primary + educ_secondary + educ_university, data = data)
+resettest(model_interaction, power = 2:3, type = "fitted")
+
+# Higher-order polynomial for income
+model_income_poly <- lm(divorced ~ I(age_married) + I(income^2) + employed + children + educ_primary + educ_secondary + educ_university, data = data)
+resettest(model_income_poly, power = 2:3, type = "fitted")
+
+# Cubic terms for age_married and income
+model_cubic <- lm(divorced ~ age_married + I(age_married^2) + I(age_married^3) + employed + income + I(income^2) + I(income^3) + children + educ_primary + educ_secondary + educ_university, data = data)
+resettest(model_cubic, power = 2:3, type = "fitted")
+
+# Log-log model
+model_loglog <- lm(divorced ~ I(log(age_married)) + I(log(income_nonnegative)) + I(log(children_nonzero)) + employed + educ_primary + educ_secondary + educ_university, data = data)
+resettest(model_loglog, power = 2:3, type = "fitted")
+
+# Interaction of categorical and continuous variables
+model_cat_interaction <- lm(divorced ~ employed * income + age_married + children + educ_primary + educ_secondary + educ_university, data = data)
+resettest(model_cat_interaction, power = 2:3, type = "fitted")
+
+# Piecewise linear regression (breakpoint at age_married = 30)
+model_piecewise <- lm(divorced ~ I(age_married) + I(pmax(0, age_married - 30)) + employed + income + children + educ_primary + educ_secondary + educ_university, data = data)
+resettest(model_piecewise, power = 2:3, type = "fitted")
+
+# Interaction between age_married and education levels
+model_educ_interaction <- lm(divorced ~ age_married * (educ_primary + educ_secondary + educ_university) + employed + income + children, data = data)
+resettest(model_educ_interaction, power = 2:3, type = "fitted")
+
+# Log transformation of children and income with interactions
+model_log_interaction <- lm(divorced ~ I(log(age_married)) + I(log(income_nonnegative)) * I(log(children + 1)) + employed + educ_primary + educ_secondary + educ_university, data = data)
+resettest(model_log_interaction, power = 2:3, type = "fitted")
+
+# Square root transformations
+model_sqrt <- lm(divorced ~ I(sqrt(age_married)) + I(sqrt(children)) + I(sqrt(income_nonnegative)) + employed + educ_primary + educ_secondary + educ_university, data = data)
+resettest(model_sqrt, power = 2:3, type = "fitted")
+
+# Model with reciprocal terms
+model_reciprocal <- lm(divorced ~ I(1/age_married) + I(1/income) + I(1/children + 0.001) + employed + educ_primary + educ_secondary + educ_university, data = data)
+resettest(model_reciprocal, power = 2:3, type = "fitted")
+
 
 ```
