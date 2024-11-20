@@ -115,9 +115,15 @@ print(summary_table)
 # simple linear reg
 model_one = lm(divorced ~ age_married, data = data)
 summary(model_one)
-model_two = lm(divorced ~ age_married + employed + children + income, data = data)
+model_two = lm(divorced ~ age_married + employed + children + income + educ_primary + educ_secondary + educ_university, data = data)
 summary(model_two)
 # get results
 coeff = coef(model_two)
 round(coeff["age_married"] * 100, 3)
+round(coeff["employed"] * 100, 3)
+round(coeff["children"] * 100, 3)
+round(coeff["income"] * 100, 3)
+round(coeff["educ_primary"] * 100, 3)
+round(coeff["educ_secondary"] * 100, 3)
+round(coeff["educ_university"] * 100, 3)
 ```
