@@ -126,7 +126,27 @@ round(coeff["income"] * 100, 3)
 round(coeff["educ_primary"] * 100, 3)
 round(coeff["educ_secondary"] * 100, 3)
 round(coeff["educ_university"] * 100, 3)
+# wls
+predicted_probs = predict(model_two)
+
+data$predicted_probs_nonnegative <- ifelse(predicted_probs < 0, 0, predicted_probs)
+
+weights = data$predicted_probs_nonnegative*(1-data$predicted_probs_nonnegative)
+wls_model = lm(divorced ~ age_married + employed + children_nonzero + income_nonnegative + educ_primary + educ_secondary + educ_university, data = data, weights = weights)
+
+summary(wls_model)
+w_coeff = coef(model_two)
+round(w_coeff["age_married"] * 100, 3)
+round(w_coeff["employed"] * 100, 3)
+round(w_coeff["children"] * 100, 3)
+round(w_coeff["income"] * 100, 3)
+round(w_coeff["educ_primary"] * 100, 3)
+round(w_coeff["educ_secondary"] * 100, 3)
+round(w_coeff["educ_university"] * 100, 3)
+
 ```
+
+
 
 ```{r}
 #functional form misspecification tests
@@ -181,10 +201,6 @@ resettest(model_log_interaction, power = 2:3, type = "fitted")
 # Square root transformations
 model_sqrt <- lm(divorced ~ I(sqrt(age_married)) + I(sqrt(children)) + I(sqrt(income_nonnegative)) + employed + educ_primary + educ_secondary + educ_university, data = data)
 resettest(model_sqrt, power = 2:3, type = "fitted")
-
-# Model with reciprocal terms
-model_reciprocal <- lm(divorced ~ I(1/age_married) + I(1/income) + I(1/children + 0.001) + employed + educ_primary + educ_secondary + educ_university, data = data)
-resettest(model_reciprocal, power = 2:3, type = "fitted")
 
 
 ```
