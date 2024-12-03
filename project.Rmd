@@ -18,7 +18,7 @@ knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE)
 # load ipums lib
 library(ipumsr)
 # get data
-ddi = read_ipums_ddi("ipumsi_00002.xml")
+ddi = read_ipums_ddi("ipumsi_00003.xml")
 data = read_ipums_micro(ddi)
 # look at data
 ipums_view(data)
@@ -41,6 +41,9 @@ sum(data$MARST == 0)
 sum(data$MARST == 9)
 sum(data$MARST == 1)
 sum(data$MARST == 4) 
+sum(data$AGE == 999)
+sum(data$AGE == 50)
+sum(data$SEX == 2)
 data = subset(data, CHBORN != 99)
 data = subset(data, EDATTAIN != 0)
 data = subset(data, INCTOT != 9999999)
