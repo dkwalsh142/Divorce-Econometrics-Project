@@ -21,11 +21,11 @@ To earn the maximum number of points, you should answer the following three ques
 
 Name the sources of your data and how they can be obtained. 
 
-  - 
+  - #Data was obtained through IPUMS. 
 
 Discuss the units of measurement of the variables of interest.
 
-  -
+  -#Age Married is measured as age of first marriage. Marital status is measured as divorce rate (if divorced in the previous year). 
   
 Explore the sample selection for your study. Make sure to show how you clean the data to prepare it for your analysis. Make sure you have a complete sample, i.e. a sample with no missing values or values which indicate missing values (e.g. 999) 
 
