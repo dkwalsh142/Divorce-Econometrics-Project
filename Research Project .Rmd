@@ -35,19 +35,34 @@ This section has a maximum of 5 points.
 To earn maximum points make sure to summarize the findings for at least two journal articles. A paragraph summarizing the findings for each paragraph of each paper is enough. Make sure to properly cite the articles using APA format.Additionally provide a citation for 3 additionally articles that are relevant towards to study. 
 
   Article 1 summary
-  
+  #The article by Booth and Edwards looked at the correlation between age at marriage and marital stability. They initially assumed that early marriage was more correlated with instability, with “the idea that early marriage has deleterious effects is firmly enclosed in the literature” (Booth and Edwards 1985). And those that are older and have more life experience may “feel confident they can cope emotionally and financially with divorce” (Booth and Edwards 1985). The intervening variables that they controlled for were education, religion, and race. The study found that those that married early (at 19 or before for women, at 20 or before for men) had the highest degree of marriage instability, with those marrying late (27 and older for women, 28 and older for men) not far behind. Those in the middle had the lowest levels of marriage instability. For this paper, it is interesting to note that the study by Booth and Edwards concluded that for those marrying at a later age, “these individuals possess certain specific traits predisposing them to marry at a later age, traits which, at the same time, make them more susceptible to marital instability” (Booth and Edwards 1985). However, specific personality traits are difficult to measure and control for, so these will not be deliberately analyzed in this paper. 
+
+Booth, Alan, and John N. Edwards. “Age at Marriage and Marital Instability.” Journal of Marriage and Family, vol. 47, no. 1, 1985, pp. 67–75. JSTOR, https://doi.org/10.2307/352069. Accessed 18 Nov. 2024.
   - 
   
   Article 2 summary
-  
+  #The article by Glenn et al. looked at how well first marriages at later ages fared in comparison with marriages with younger individuals. They found similar results as the study by Booth and Edwards, as “the findings do suggest that most persons have little or nothing to gain in the way of marital success by deliberately postponing marriage beyond the mid-twenties” (Glenn et al. 2010). And that “the greatest indicated likelihood of being in an intact marriage of the highest quality is among those who married at ages 22–25” (Glenn et al. 2010). However, while the early to mid 20s seems to be the optimal age to get married in terms of minimizing the risk of divorce, the overall trend for marriage success is a positive relationship with age, as “in the United States in recent years, the later marriages as a whole have been at least as likely to survive as the moderately late ones and much more likely to do so than the earliest ones” (Glenn et al. 2010). However, the actual reasoning behind this is not due to maturity or life experience. In fact, “marital success apparently increases with age at marriage only up to the early to mid twenties, with increases in marital survival beyond those ages resulting entirely from a greater tendency for persons to remain in mediocre or poor marriages” (Glenn et al. 2010). Ironically, in this economic analysis, people seem to heavily weigh the sunk cost fallacy as they get older. These two articles provide a framework of reference for this study, with both of them concluding that the middle age to get married, roughly early to late 20s, is the sweet spot, with those marrying younger than that most likely to experience marriage instability, and those marrying older than that fairing better, but only because they do not want to leave at that point. 
+Glenn, N. D., Uecker, J. E., & Love, R. W. B. (2010). Later first marriage and marital success. Social Science Research, 39(5), 787–800. https://doi.org/10.1016/j.ssresearch.2010.06.002
   - 
 
 
 Three additional relevant article citations
 
--
--
--
+Bartle-Haring, S., Shannon, S., Holowacz, E., Patton, R., & Lotspeich-Younkin, F. (2018). Is There the “Sweet Spot” for Age at Marriage and Positive Marital Outcomes? Journal of Family Issues, 39(4), 1085–1107. https://doi.org/10.1177/0192513X16686135
+
+Lampard, R. (2013). Age at marriage and the risk of divorce in England and Wales. Demographic Research, 29, 167–202. https://www.jstor.org/stable/26348151
+Journal of Demographic Research, not ranked on repec. 
+Cited by 31.
+
+Lee, G. R. (1977). Age at Marriage and Marital Satisfaction: A Multivariate Analysis with Implications for Marital Stability. Journal of Marriage and Family, 39(3), 493–504. https://doi.org/10.2307/350904
+Journal of Marriage and Family, not ranked on repec. First in family studies.
+Cited by 169
+
+Schoen, R. (1975). California Divorce Rates by Age at First Marriage and Duration of First Marriage. Journal of Marriage and Family, 37(3), 548–555. https://doi.org/10.2307/350518. 
+Journal of Marriage and Family, not ranked on repec. First in family studies.
+Cited by 94. 
+
+Lehrer, E. L. (2008). Age at marriage and marital instability: Revisiting the Becker–Landes–Michael hypothesis. Journal of Population Economics, 21(2), 463–484. https://doi.org/10.1007/s00148-006-0092-9
 
 
 ### Plot
