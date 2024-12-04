@@ -20,11 +20,14 @@ library(ipumsr)
 # get data
 ddi = read_ipums_ddi("ipumsi_00003.xml")
 data = read_ipums_micro(ddi)
+#Fix men
+data$CHBORN[data$SEX == 1 & data$CHBORN == 99] <- 0
 # look at data
 ipums_view(data)
 ```
 
 ```{r}
+
 ## check for missing data 
 sum(data$EDATTAIN == 0) 
 sum(data$EDATTAIN == 9) 
@@ -62,7 +65,9 @@ data$educ_university = ifelse(data$EDATTAIN == 4, 1, 0)
 # income 
 data$income = data$INCTOT
 # children
-data$children = data$CHBORN
+data$children = data$NCHILD
+# male
+data$male = ifelse(data$SEX == 1, 1, 0)
 # employment
 data$employed = ifelse(data$EMPSTAT == 1, 1, 0)
 ## independent variable
@@ -94,7 +99,7 @@ ggplot(data, aes(x = factor(divorced), y = age_married)) +
 # Desired variable names
 var_names <- c("divorced", "age_married", "employed", "children", 
                "income", "educ_university", "educ_secondary", 
-               "educ_primary", "educ_min", "urban")
+               "educ_primary", "educ_min", "urban", "male", "AGE")
 
 # Subset data to include only desired variables
 filtered_data <- data[, var_names, drop = FALSE]
@@ -115,10 +120,12 @@ print(summary_table)
 ```
 
 ```{r}
+
+
 # simple linear reg
 model_one = lm(divorced ~ age_married, data = data)
 summary(model_one)
-model_two = lm(divorced ~ age_married + employed + children + income + educ_primary + educ_secondary + educ_university, data = data)
+model_two = lm(divorced ~ age_married + employed + children + income + educ_primary + educ_secondary + educ_university + male + AGE, data = data)
 summary(model_two)
 # get results
 coeff = coef(model_two)
@@ -129,13 +136,18 @@ round(coeff["income"] * 100, 3)
 round(coeff["educ_primary"] * 100, 3)
 round(coeff["educ_secondary"] * 100, 3)
 round(coeff["educ_university"] * 100, 3)
+round(coeff["male"] * 100, 3)
+round(coeff["AGE"] * 100, 3)
 # wls
 predicted_probs = predict(model_two)
 
 data$predicted_probs_nonnegative <- ifelse(predicted_probs < 0, 0, predicted_probs)
+data$children_nonzero <- ifelse(data$children == 0, 0.01, data$children)
+data$income_nonnegative <- ifelse(data$income <= 0, 0.01, data$income)
+
 
 weights = data$predicted_probs_nonnegative*(1-data$predicted_probs_nonnegative)
-wls_model = lm(divorced ~ age_married + employed + children_nonzero + income_nonnegative + educ_primary + educ_secondary + educ_university, data = data, weights = weights)
+wls_model = lm(divorced ~ age_married + employed + children_nonzero + income_nonnegative + educ_primary + educ_secondary + educ_university + AGE + male, data = data, weights = weights)
 
 summary(wls_model)
 w_coeff = coef(model_two)
@@ -146,64 +158,104 @@ round(w_coeff["income"] * 100, 3)
 round(w_coeff["educ_primary"] * 100, 3)
 round(w_coeff["educ_secondary"] * 100, 3)
 round(w_coeff["educ_university"] * 100, 3)
-
+round(coeff["male"] * 100, 3)
+round(coeff["AGE"] * 100, 3)
 ```
 
 
 
 ```{r}
+#THIS IS GONNA TAKE UP A LOT OF DRIVE SPACE SO MAYBE BREAK UP INTO CHUNKS AND THEN SWEEP AFTER EACH
+
 #functional form misspecification tests
 install.packages("lmtest")
 library(lmtest)
 
-model = lm(divorced ~ age_married + employed + children + income + educ_primary + educ_secondary + educ_university, data = data)
-resettest(model, power = 2:3, type = "fitted")
-
-data$income_nonnegative <- ifelse(data$income <= 0, .1, data$income)
-data$children_nonzero <- ifelse(data$children <= 0, .1, data$children)
-
-model_2 = lm(divorced ~ I(log(age_married)) + employed + I(log(children_nonzero)) + I(log(income_nonnegative)) + educ_primary + educ_secondary + educ_university, data = data)
+# Log transformation of age_married, children, and income to test non-linear relationships, now with age and male included
+model_2 = lm(divorced ~ I(log(age_married)) + employed + I(log(children_nonzero)) + I(log(income_nonnegative)) + educ_primary + educ_secondary + educ_university + AGE + male, data = data)
 resettest(model_2, power = 2:3, type = "fitted")
 
-# Polynomial terms
-model_poly <- lm(divorced ~ age_married + I(age_married^2) + employed + children + income + educ_primary + educ_secondary + educ_university, data = data)
+# Polynomial terms for age_married to test quadratic effects on divorce, with age and male as additional predictors
+model_poly <- lm(divorced ~ age_married + I(age_married^2) + employed + children + income + educ_primary + educ_secondary + educ_university + AGE + male, data = data)
 resettest(model_poly, power = 2:3, type = "fitted")
 
-# Interaction terms
-model_interaction <- lm(divorced ~ age_married * income + employed + children + educ_primary + educ_secondary + educ_university, data = data)
+# Interaction terms between age_married and income to examine how their relationship affects divorce, now including age and male
+model_interaction <- lm(divorced ~ age_married * income + employed + children + educ_primary + educ_secondary + educ_university + AGE + male, data = data)
 resettest(model_interaction, power = 2:3, type = "fitted")
 
-# Higher-order polynomial for income
-model_income_poly <- lm(divorced ~ I(age_married) + I(income^2) + employed + children + educ_primary + educ_secondary + educ_university, data = data)
+# Higher-order polynomial for income to test for non-linear effects on divorce, with age and male as predictors
+model_income_poly <- lm(divorced ~ I(age_married) + I(income^2) + employed + children + educ_primary + educ_secondary + educ_university + AGE + male, data = data)
 resettest(model_income_poly, power = 2:3, type = "fitted")
 
-# Cubic terms for age_married and income
-model_cubic <- lm(divorced ~ age_married + I(age_married^2) + I(age_married^3) + employed + income + I(income^2) + I(income^3) + children + educ_primary + educ_secondary + educ_university, data = data)
+# Cubic terms for age_married and income to explore complex relationships with divorce, now including age and male
+model_cubic <- lm(divorced ~ age_married + I(age_married^2) + I(age_married^3) + employed + income + I(income^2) + I(income^3) + children + educ_primary + educ_secondary + educ_university + AGE + male, data = data)
 resettest(model_cubic, power = 2:3, type = "fitted")
 
-# Log-log model
-model_loglog <- lm(divorced ~ I(log(age_married)) + I(log(income_nonnegative)) + I(log(children_nonzero)) + employed + educ_primary + educ_secondary + educ_university, data = data)
+# Log-log model to investigate the multiplicative relationships between the continuous variables and divorce, including AGE and male
+model_loglog <- lm(divorced ~ I(log(age_married)) + I(log(income_nonnegative)) + I(log(children_nonzero)) + employed + educ_primary + educ_secondary + educ_university + AGE + male, data = data)
 resettest(model_loglog, power = 2:3, type = "fitted")
 
-# Interaction of categorical and continuous variables
-model_cat_interaction <- lm(divorced ~ employed * income + age_married + children + educ_primary + educ_secondary + educ_university, data = data)
+# Interaction of categorical and continuous variables to examine combined effects on divorce, now with AGE and male
+model_cat_interaction <- lm(divorced ~ employed * income + age_married + children + educ_primary + educ_secondary + educ_university + AGE + male, data = data)
 resettest(model_cat_interaction, power = 2:3, type = "fitted")
 
-# Piecewise linear regression (breakpoint at age_married = 30)
-model_piecewise <- lm(divorced ~ I(age_married) + I(pmax(0, age_married - 30)) + employed + income + children + educ_primary + educ_secondary + educ_university, data = data)
+# Piecewise linear regression with a breakpoint at age_married = 30 to assess how the relationship changes after a certain AGE, including AGE and male
+model_piecewise <- lm(divorced ~ I(age_married) + I(pmax(0, age_married - 30)) + employed + income + children + educ_primary + educ_secondary + educ_university + AGE + male, data = data)
 resettest(model_piecewise, power = 2:3, type = "fitted")
 
-# Interaction between age_married and education levels
-model_educ_interaction <- lm(divorced ~ age_married * (educ_primary + educ_secondary + educ_university) + employed + income + children, data = data)
+# Interaction between age_married and education levels to explore how different levels of education impact divorce likelihood, now including AGE and male
+model_educ_interaction <- lm(divorced ~ age_married * (educ_primary + educ_secondary + educ_university) + employed + income + children + AGE + male, data = data)
 resettest(model_educ_interaction, power = 2:3, type = "fitted")
 
-# Log transformation of children and income with interactions
-model_log_interaction <- lm(divorced ~ I(log(age_married)) + I(log(income_nonnegative)) * I(log(children + 1)) + employed + educ_primary + educ_secondary + educ_university, data = data)
+# Log transformations of children and income with interactions, and male and AGE included, to check for non-linear combined effects on divorce
+model_log_interaction <- lm(divorced ~ I(log(age_married)) + I(log(income_nonnegative)) * I(log(children + 1)) + employed + educ_primary + educ_secondary + educ_university + AGE + male, data = data)
 resettest(model_log_interaction, power = 2:3, type = "fitted")
 
-# Square root transformations
-model_sqrt <- lm(divorced ~ I(sqrt(age_married)) + I(sqrt(children)) + I(sqrt(income_nonnegative)) + employed + educ_primary + educ_secondary + educ_university, data = data)
+# Square root transformations for age_married, children, and income to model their impact on divorce with diminishing returns, considering AGE and male
+model_sqrt <- lm(divorced ~ I(sqrt(age_married)) + I(sqrt(children)) + I(sqrt(income_nonnegative)) + employed + educ_primary + educ_secondary + educ_university + AGE + male, data = data)
 resettest(model_sqrt, power = 2:3, type = "fitted")
+
+```
+
+```{r}
+
+# Interaction between male and age_married to examine if the effect of age at marriage differs by gender
+model_age_male_interaction <- lm(divorced ~ age_married * male + income + children + educ_primary + educ_secondary + educ_university + AGE, data = data)
+resettest(model_age_male_interaction, power = 2:3, type = "fitted")
+
+# Interaction between male and children to explore if the effect of children on divorce differs by gender
+model_children_male_interaction <- lm(divorced ~ children * male + age_married + income + educ_primary + educ_secondary + educ_university + AGE, data = data)
+resettest(model_children_male_interaction, power = 2:3, type = "fitted")
+
+# Interaction between male and employment status to check if the effect of being employed on divorce differs by gender
+model_employment_male_interaction <- lm(divorced ~ employed * male + age_married + children + income + educ_primary + educ_secondary + educ_university + AGE, data = data)
+resettest(model_employment_male_interaction, power = 2:3, type = "fitted")
+
+# Interaction between male and education level (primary education) to test if the effect of primary education on divorce varies by gender
+model_educ_primary_male_interaction <- lm(divorced ~ educ_primary * male + age_married + children + income + employed + educ_secondary + educ_university + AGE, data = data)
+resettest(model_educ_primary_male_interaction, power = 2:3, type = "fitted")
+
+# Interaction between male and education level (secondary education) to test if the effect of secondary education on divorce varies by gender
+model_educ_secondary_male_interaction <- lm(divorced ~ educ_secondary * male + age_married + children + income + employed + educ_primary + educ_university + AGE, data = data)
+resettest(model_educ_secondary_male_interaction, power = 2:3, type = "fitted")
+
+# Interaction between male and education level (university education) to check if the effect of university education on divorce differs by gender
+model_educ_university_male_interaction <- lm(divorced ~ educ_university * male + age_married + children + income + employed + educ_primary + educ_secondary + AGE, data = data)
+resettest(model_educ_university_male_interaction, power = 2:3, type = "fitted")
+
+# Interaction between male and non-negative income to explore if the effect of income on divorce differs for males with non-negative income
+model_income_nonneg_male_interaction <- lm(divorced ~ income_nonnegative * male + age_married + children + educ_primary + educ_secondary + educ_university + AGE, data = data)
+resettest(model_income_nonneg_male_interaction, power = 2:3, type = "fitted")
+
+# Interaction between male and age at first marriage to examine whether the age at first marriage affects divorce differently for males
+model_age_first_marriage_male_interaction <- lm(divorced ~ age_married * male + AGE + children + income + employed + educ_primary + educ_secondary + educ_university, data = data)
+resettest(model_age_first_marriage_male_interaction, power = 2:3, type = "fitted")
+
+# Interaction between male and a piecewise model of age_married to test if the relationship between age at marriage and divorce differs for males before and after a certain AGE
+model_piecewise_age_male_interaction <- lm(divorced ~ I(age_married) + I(pmax(0, age_married - 30)) * male + employed + income + children + educ_primary + educ_secondary + educ_university + AGE, data = data)
+resettest(model_piecewise_age_male_interaction, power = 2:3, type = "fitted")
+
+
 
 
 ```
