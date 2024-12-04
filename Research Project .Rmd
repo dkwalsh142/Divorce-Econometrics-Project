@@ -153,7 +153,25 @@ This section has a maximum of 15 points.
 To earn the maximum number of points, present summary statistics for the variables used in the analysis in a table (mean, standard deviation, minimum, maximum, number of observations) and include a summary table with them. All categorical variables, variables that are not continuous (e.g., race, gender), need to be presented by category. The variables should have labelled clearly. 
 
 ```{r, echo=TRUE, evaluate=TRUE}
+var_names <- c("divorced", "age_married", "employed", "children", 
+               "income", "educ_university", "educ_secondary", 
+               "educ_primary", "educ_min", "urban", "male", "AGE")
 
+# Subset data to include only desired variables
+filtered_data <- data[, var_names, drop = FALSE]
+
+# Create summary statistics table
+summary_table <- data.frame(
+  Variable = var_names,
+  Mean = round(sapply(filtered_data, mean, na.rm = TRUE), 2),
+  Std_Dev = round(sapply(filtered_data, sd, na.rm = TRUE), 2),
+  Min = sapply(filtered_data, min, na.rm = TRUE),
+  Max = sapply(filtered_data, max, na.rm = TRUE),
+  Observations = sapply(filtered_data, function(x) sum(!is.na(x)))
+)
+
+# View table
+print(summary_table)
 
 ```
 
