@@ -1,6 +1,7 @@
 ---
-title: "The correlation of Variable X and Variable Y"
-authors: Student names
+title: "AGEMARR vs MARST- An analysis of Age at First Marriage and Divorce Rates "
+authors: "Declan Walsh, Gavin Galen, and Jawand Singh"
+date: "12/6/24"
 output: html_document
 ---
 
