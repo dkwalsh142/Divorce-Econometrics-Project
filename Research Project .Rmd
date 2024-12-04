@@ -28,6 +28,64 @@ Explore the sample selection for your study. Make sure to show how you clean the
   
 ```{r, echo=TRUE, evaluate=TRUE}
 
+# install libraries
+# install.packages(c("htmltools", "shiny", "DT"))
+# load ipums lib
+library(ipumsr)
+# get data
+ddi = read_ipums_ddi("ipumsi_00003.xml")
+data = read_ipums_micro(ddi)
+
+#Fix men
+data$CHBORN[data$SEX == 1 & data$CHBORN == 99] <- 0
+
+## check for missing data 
+sum(data$EDATTAIN == 0) 
+sum(data$EDATTAIN == 9) 
+sum(data$INCTOT == 9999999)
+sum(data$CHBORN == 98)
+sum(data$CHBORN == 99)
+sum(data$EMPSTAT == 0)
+sum(data$EMPSTAT == 9)
+sum(data$AGEMARR == 0)
+sum(data$AGEMARR == 99)
+sum(data$AGEMARR < 18) # 5,572,243 / 11,343,120
+                       # 488,465   / 2,969,960
+sum(data$MARST == 0)
+sum(data$MARST == 9)
+sum(data$MARST == 1)
+sum(data$MARST == 4) 
+sum(data$AGE == 999)
+sum(data$AGE == 50)
+sum(data$SEX == 2)
+data = subset(data, CHBORN != 99)
+data = subset(data, EDATTAIN != 0)
+data = subset(data, INCTOT != 9999999)
+data = subset(data, EMPSTAT != 0)
+data = subset(data, AGEMARR != 0)
+data = subset(data, MARST != 1)
+data = subset(data, MARST != 4)
+## control variables
+# urban area
+data$urban = ifelse(data$METROUS != 0, 1, 0)
+# education 
+data$educ_min = ifelse(data$EDATTAIN == 1, 1, 0)
+data$educ_primary = ifelse(data$EDATTAIN == 2, 1, 0)
+data$educ_secondary = ifelse(data$EDATTAIN == 3, 1, 0)
+data$educ_university = ifelse(data$EDATTAIN == 4, 1, 0)
+# income 
+data$income = data$INCTOT
+# children
+data$children = data$NCHILD
+# male
+data$male = ifelse(data$SEX == 1, 1, 0)
+# employment
+data$employed = ifelse(data$EMPSTAT == 1, 1, 0)
+## independent variable
+data$age_married = data$AGEMARR
+## dependent variable
+data$divorced = ifelse(data$MARST == 3, 1, 0)
+
 ```
 
 ### Literature Review
@@ -71,6 +129,22 @@ To earn the maximum number of points, you need to create a graph of your variabl
 
 ```{r, echo=TRUE, evaluate=TRUE}
 
+# box plot 
+library(ggplot2)
+library(haven)
+ggplot(data, aes(x = factor(divorced), y = age_married)) +
+  geom_boxplot() +
+  labs(
+    title = "Distibution of Age at First Marriage Based on Marital Status",
+    x = "Marital Status", 
+    y = "Age of First Marriage",
+    caption = "Source: Data from IPUMS International, USA 1980"
+  ) +
+  scale_color_manual(
+    name = "Marital Status",
+    values = c("Group 1" = "blue", "Group 2" = "red"),
+    labels = c("Married", "Divorced")
+  )
 
 ```
 
