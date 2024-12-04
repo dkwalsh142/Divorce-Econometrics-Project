@@ -20,13 +20,13 @@ library(ipumsr)
 # get data
 ddi = read_ipums_ddi("ipumsi_00003.xml")
 data = read_ipums_micro(ddi)
-#Fix men
-data$CHBORN[data$SEX == 1 & data$CHBORN == 99] <- 0
 # look at data
 ipums_view(data)
 ```
 
 ```{r}
+#Fix men
+data$CHBORN[data$SEX == 1 & data$CHBORN == 99] <- 0
 
 ## check for missing data 
 sum(data$EDATTAIN == 0) 
