@@ -5,6 +5,10 @@ output: html_document
 ---
 
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE)
+```
+
 ## Your Data set choice {.tabset}
 
 
@@ -181,7 +185,7 @@ To earn the maximum number of points, you need to answer the following questions
 
 
 Write the equation you estimate. 
-  -
+  - 
 
 A convincing discussion of what variables to control for is essential. Are your results causal or not? Discuss potential concerns with omitted variables etc along with the consequences of those problems.
 
@@ -197,6 +201,47 @@ A convincing discussion of what variables to control for is essential. Are your 
  
  
 ```{r, echo=TRUE, evaluate=TRUE}
+library(modelsummary)
+
+# simple linear reg
+#model_one = lm(divorced ~ age_married, data = data)
+#summary(model_one)
+model_two = lm(divorced ~ age_married + employed + children + income + educ_primary + educ_secondary + educ_university + male + AGE, data = data)
+modelsummary(model_two, stars = TRUE, gof_omit = 'AIC|BIC|Lik|F|RMSE')
+
+# wls
+predicted_probs = predict(model_two)
+
+data$predicted_probs_nonnegative <- ifelse(predicted_probs < 0, 0, predicted_probs)
+data$children_nonzero <- ifelse(data$children == 0, 0.01, data$children)
+data$income_nonnegative <- ifelse(data$income <= 0, 0.01, data$income)
+
+
+weights = data$predicted_probs_nonnegative*(1-data$predicted_probs_nonnegative)
+
+wls_model_1 = lm(divorced ~ age_married, data = data, weights = weights)
+
+wls_model_2 = lm(divorced ~ age_married + employed, data = data, weights = weights)
+
+wls_model_3 = lm(divorced ~ age_married + employed + children_nonzero, data = data, weights = weights)
+
+wls_model_4 = lm(divorced ~ age_married + employed + children_nonzero + income_nonnegative, data = data, weights = weights)
+
+wls_model_5 = lm(divorced ~ age_married + employed + children_nonzero + income_nonnegative + educ_primary + educ_secondary + educ_university, data = data, weights = weights)
+
+wls_model_6 = lm(divorced ~ age_married + employed + children_nonzero + income_nonnegative + educ_primary + educ_secondary + educ_university + AGE, data = data, weights = weights)
+
+wls_model_7 = lm(divorced ~ age_married + employed + children_nonzero + income_nonnegative + educ_primary + educ_secondary + educ_university + AGE + male, data = data, weights = weights)
+
+models <- list("Model 1" = wls_model_1,
+               "Model 2" = wls_model_2,
+               "Model 3" = wls_model_3,
+               "Model 4" = wls_model_4,
+               "Model 5" = wls_model_5,
+               "Model 6" = wls_model_6,
+               "Model 7" = wls_model_7)
+
+modelsummary(models, stars = TRUE, gof_omit = 'AIC|BIC|Lik|F|RMSE')
 
 ```
 
