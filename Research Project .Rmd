@@ -260,6 +260,7 @@ This section has a maximum of 10 points.
 To earn the maximum number of points, discuss what identification strategy would be suitable for solving the endogeneity problem. If this is not possible, discuss why it is impossible to find an identification strategy.
 You do not need to run the regression.
 
+#It was not possible for our group to find an idenification strategy. All relevant variables were included, they were correctly sampled, as well as being measured correctly. Maritial satsifaction could be a potential omitted variable that would influence the dependent variable, however it is extremely difficult to create a proxy variable for. We tried adding age, gender, and other variables, but they did not create a dsicernable difference. 
 
 ```{r, echo=TRUE, evaluate=TRUE}
 
