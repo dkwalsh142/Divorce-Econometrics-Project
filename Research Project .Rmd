@@ -186,19 +186,26 @@ To earn the maximum number of points, you need to answer the following questions
 
 
 Write the equation you estimate. 
-  - 
+  - divorced = (b1)age_married + (b2)employed + (b3)children + (b4)income + (b5)educ_primary + (b6)educ_secondary + (b7)educ_university + (b8)male 
 
 A convincing discussion of what variables to control for is essential. Are your results causal or not? Discuss potential concerns with omitted variables etc along with the consequences of those problems.
 
-  -
+  - We came to see significant difficulty with functional form mispecification. After attempting multiple transformations including quadratics, cubics, polynomials, logs, interaction terms, and piecewise functions we were unable to create a models with a p-value > 2.2e-16 during the RESET test. We believe this to be due to the fact that the variables that most influence divorce rate is marital satisfaction which is an imeasurable variable that is incredibly difficult to measure. That being said, this study can provide insights. We see that education has the largest impact in divorce rates, as a college level education (compared to no education) decreased likelihood of divorce by 10.5%. While we are confident that this value is biased, it could still be beneficial for policy makers to know that of all the variable studied, education should be targeted to decrease divorce rates.
 
  Present your results in a table that includes coefficients, standard error, R-squared and number of observations. The control variables should be added one by one, and the results should be reported in separate columns (number of observations should be constant, if not you may not have cleaned your data correctly)
  
- - 
+ - See below.
  
  Write about the magnitude and interpretations of your coefficients. Are they statistically significant (includes significance levels in tables)? Do they have the expected sign (this may indicate a specification problem, for example, omitted variables)?
  
- -
+ - The interpretations of our coefficients are as followed. 
+    - age_married: A 1 year increase in age at marriage is associated with a decrease divorce in likelihood of .2%
+    - children: An increase in 1 child is associated with a decrease in divorce likelihood of 5.9%
+    - income: A 1000 dollar increase in age at marriage is associated with a decrease in divorce likelihood of 1.6%
+    - educ_primary: A primary school education (compared to no education) is associated with a decrease in divorce likelihood of .2%
+    - educ_secondary: A secondary school education (compared to no education) is associated with a decrease in divorce likelihood of 6.6%
+    - educ_university: A university education (compared to no education) is associated with a decrease in divorce likelihood of 10.3%
+    - male: Being male (compared to female) is associated with a decrease in divorce likelihood of 4.1%
  
  
 ```{r, echo=TRUE, evaluate=TRUE}
@@ -207,7 +214,7 @@ library(modelsummary)
 # simple linear reg
 #model_one = lm(divorced ~ age_married, data = data)
 #summary(model_one)
-model_two = lm(divorced ~ age_married + employed + children + income + educ_primary + educ_secondary + educ_university + male + AGE, data = data)
+model_two = lm(divorced ~ age_married + children + income + educ_primary + educ_secondary + educ_university + male + AGE, data = data)
 modelsummary(model_two, stars = TRUE, gof_omit = 'AIC|BIC|Lik|F|RMSE')
 
 # wls
@@ -222,27 +229,24 @@ weights = data$predicted_probs_nonnegative*(1-data$predicted_probs_nonnegative)
 
 wls_model_1 = lm(divorced ~ age_married, data = data, weights = weights)
 
-wls_model_2 = lm(divorced ~ age_married + employed, data = data, weights = weights)
+wls_model_3 = lm(divorced ~ age_married + children_nonzero, data = data, weights = weights)
 
-wls_model_3 = lm(divorced ~ age_married + employed + children_nonzero, data = data, weights = weights)
+wls_model_4 = lm(divorced ~ age_married + children_nonzero + income_nonnegative, data = data, weights = weights)
 
-wls_model_4 = lm(divorced ~ age_married + employed + children_nonzero + income_nonnegative, data = data, weights = weights)
+wls_model_5 = lm(divorced ~ age_married + children_nonzero + income_nonnegative + educ_primary + educ_secondary + educ_university, data = data, weights = weights)
 
-wls_model_5 = lm(divorced ~ age_married + employed + children_nonzero + income_nonnegative + educ_primary + educ_secondary + educ_university, data = data, weights = weights)
+wls_model_6 = lm(divorced ~ age_married + children_nonzero + income_nonnegative + educ_primary + educ_secondary + educ_university + male, data = data, weights = weights)
 
-wls_model_6 = lm(divorced ~ age_married + employed + children_nonzero + income_nonnegative + educ_primary + educ_secondary + educ_university + AGE, data = data, weights = weights)
-
-wls_model_7 = lm(divorced ~ age_married + employed + children_nonzero + income_nonnegative + educ_primary + educ_secondary + educ_university + AGE + male, data = data, weights = weights)
 
 models <- list("Model 1" = wls_model_1,
-               "Model 2" = wls_model_2,
-               "Model 3" = wls_model_3,
-               "Model 4" = wls_model_4,
-               "Model 5" = wls_model_5,
-               "Model 6" = wls_model_6,
-               "Model 7" = wls_model_7)
+               "Model 2" = wls_model_3,
+               "Model 3" = wls_model_4,
+               "Model 4" = wls_model_5,
+               "Model 5" = wls_model_6)
 
 modelsummary(models, stars = TRUE, gof_omit = 'AIC|BIC|Lik|F|RMSE')
+
+print(coef(wls_model_6)["income_nonnegative"] * 1000)
 
 ```
 
