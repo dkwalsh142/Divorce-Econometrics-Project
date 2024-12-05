@@ -125,7 +125,7 @@ print(summary_table)
 # simple linear reg
 model_one = lm(divorced ~ age_married, data = data)
 summary(model_one)
-model_two = lm(divorced ~ age_married + employed + children + income + educ_primary + educ_secondary + educ_university + male + AGE, data = data)
+model_two = lm(divorced ~ age_married  + children + income + educ_primary + educ_secondary + educ_university + male + AGE, data = data)
 summary(model_two)
 # get results
 coeff = coef(model_two)
@@ -147,7 +147,7 @@ data$income_nonnegative <- ifelse(data$income <= 0, 0.01, data$income)
 
 
 weights = data$predicted_probs_nonnegative*(1-data$predicted_probs_nonnegative)
-wls_model = lm(divorced ~ age_married + employed + children_nonzero + income_nonnegative + educ_primary + educ_secondary + educ_university + AGE + male, data = data, weights = weights)
+wls_model = lm(divorced ~ age_married + children_nonzero + income_nonnegative + educ_primary + educ_secondary + educ_university + AGE + male, data = data, weights = weights)
 
 summary(wls_model)
 w_coeff = coef(model_two)
@@ -162,13 +162,40 @@ round(coeff["male"] * 100, 3)
 round(coeff["AGE"] * 100, 3)
 ```
 
+```{r}
+library(lmtest)
+model_combined <- lm(
+  divorced ~ 
+    # Log transformations for potential non-linear effects
+    I(log(age_married)) + I(log(children_nonzero)) + I(log(income_nonnegative)) + 
+    # Polynomial terms for quadratic and cubic effects
+    age_married + I(age_married^2) + I(age_married^3) + 
+    income + I(income^2) + I(income^3) +
+    # Square root transformations for diminishing returns
+    I(sqrt(age_married)) + I(sqrt(children)) + I(sqrt(income_nonnegative)) + 
+    # Piecewise linear regression for age_married with a breakpoint at 30
+    I(pmax(0, age_married - 30)) + 
+    # Interaction terms for relationships between variables
+    age_married * income + 
+    employed * income + 
+    age_married * (educ_primary + educ_secondary + educ_university) + 
+    male * (age_married + income + children  + educ_primary + educ_secondary + educ_university) +
+    # Main effects
+    children + 
+    educ_primary + educ_secondary + educ_university + 
+    AGE + male, 
+  data = data
+)
 
+resettest(model_combined, power = 2:3, type = "fitted")
+
+```
 
 ```{r}
 #THIS IS GONNA TAKE UP A LOT OF DRIVE SPACE SO MAYBE BREAK UP INTO CHUNKS AND THEN SWEEP AFTER EACH
 
 #functional form misspecification tests
-install.packages("lmtest")
+#install.packages("lmtest")
 library(lmtest)
 
 # Log transformation of age_married, children, and income to test non-linear relationships, now with age and male included
