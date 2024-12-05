@@ -199,13 +199,17 @@ A convincing discussion of what variables to control for is essential. Are your 
  Write about the magnitude and interpretations of your coefficients. Are they statistically significant (includes significance levels in tables)? Do they have the expected sign (this may indicate a specification problem, for example, omitted variables)?
  
  - The interpretations of our coefficients are as followed. 
-    - age_married: A 1 year increase in age at marriage is associated with a decrease divorce in likelihood of .2%
-    - children: An increase in 1 child is associated with a decrease in divorce likelihood of 5.9%
-    - income: A 1000 dollar increase in age at marriage is associated with a decrease in divorce likelihood of 1.6%
-    - educ_primary: A primary school education (compared to no education) is associated with a decrease in divorce likelihood of .2%
-    - educ_secondary: A secondary school education (compared to no education) is associated with a decrease in divorce likelihood of 6.6%
-    - educ_university: A university education (compared to no education) is associated with a decrease in divorce likelihood of 10.3%
-    - male: Being male (compared to female) is associated with a decrease in divorce likelihood of 4.1%
+    - age_married: A 1 year increase in age at marriage is associated with a decrease divorce in likelihood of .4%
+    - children: An increase in 1 child is associated with a decrease in divorce likelihood of 4.8%
+    - income: A 1000 dollar increase in age at marriage is associated with a increase in divorce likelihood of 1.2%
+    - educ_primary: A primary school education (compared to no education) is associated with a decrease in divorce likelihood of 1.8%
+    - educ_secondary: A secondary school education (compared to no education) is associated with a decrease in divorce likelihood of 2.4%
+    - educ_university: A university education (compared to no education) is associated with a decrease in divorce likelihood of 5.8%
+    - male: Being male (compared to female) is associated with a decrease in divorce likelihood of 3.2%
+    
+    Unsurprisingly, while all of the variables were statistically significant, they all have a small magnitude (we believe that marital satisfaction is the leading influence). We were at first surprised by the sign of income, thinking that if income is higher, you'd be happier in your current situation, however we realised that a higher income means greater self reliance. Thus making you more willing to divorce someone because you know you can fall back on your own sources of income.
+    
+    
  
  
 ```{r, echo=TRUE, evaluate=TRUE}
